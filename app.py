@@ -44,8 +44,14 @@ def add_task(task: str) -> dict[str, str]:
     return new_task
 
 
-def list_tasks() -> list[dict[str, str]]:
-    return _load_tasks()
+def list_tasks() -> None:
+    tasks = _load_tasks()
+    if not tasks:
+        print("No tasks yet.")
+        return
+
+    for index, task in enumerate(tasks, start=1):
+        print(f"{index}. {task['task']}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -68,13 +74,7 @@ def main() -> None:
             task = add_task(args.task)
             print(f"Added: {task['task']}")
         elif args.command == "list":
-            tasks = list_tasks()
-            if not tasks:
-                print("No tasks yet.")
-                return
-
-            for index, task in enumerate(tasks, start=1):
-                print(f"{index}. {task['task']}")
+            list_tasks()
     except ValueError as exc:
         parser.error(str(exc))
 
