@@ -54,12 +54,28 @@ def list_tasks() -> None:
         print(f"{index}. {task['task']}")
 
 
+def delete_task(index: int) -> dict[str, str]:
+    if index < 1:
+        raise ValueError("Task index must be 1 or greater")
+
+    tasks = _load_tasks()
+    if index > len(tasks):
+        raise ValueError(f"Task index {index} does not exist")
+
+    removed_task = tasks.pop(index - 1)
+    _save_tasks(tasks)
+    return removed_task
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="A simple todo CLI.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     add_parser = subparsers.add_parser("add", help="Add a task")
     add_parser.add_argument("task", help="Task description")
+
+    delete_parser = subparsers.add_parser("delete", help="Delete a task")
+    delete_parser.add_argument("index", type=int, help="1-based task index")
 
     subparsers.add_parser("list", help="List tasks")
     return parser
@@ -73,6 +89,9 @@ def main() -> None:
         if args.command == "add":
             task = add_task(args.task)
             print(f"Added: {task['task']}")
+        elif args.command == "delete":
+            task = delete_task(args.index)
+            print(f"Deleted: {task['task']}")
         elif args.command == "list":
             list_tasks()
     except ValueError as exc:
